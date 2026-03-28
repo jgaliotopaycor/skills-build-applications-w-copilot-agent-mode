@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { apiUrl } from '../api';
+
+// Codespace API endpoint (used in production/dev codespaces):
+// example: my-codespace-8000.app.github.dev/api/workouts
 
 export default function Workouts() {
   const [items, setItems] = useState([]);
@@ -6,11 +10,7 @@ export default function Workouts() {
 
   const fetchData = () => {
     setLoading(true);
-    const codespace = process.env.REACT_APP_CODESPACE_NAME;
-    const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
-    const base = codespace ? `${protocol}://${codespace}-8000.app.github.dev` : '';
-    const endpointPath = 'workouts';
-    const url = `${base}/api/${endpointPath}/`;
+    const url = apiUrl('workouts');
 
     fetch(url)
       .then((res) => res.json())

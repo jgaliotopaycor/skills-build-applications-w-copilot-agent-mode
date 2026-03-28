@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { apiUrl } from '../api';
+
+// Codespace API endpoint (used in production/dev codespaces):
+// example: my-codespace-8000.app.github.dev/api/users
 
 export default function Users() {
   const [items, setItems] = useState([]);
@@ -6,11 +10,7 @@ export default function Users() {
 
   const fetchData = () => {
     setLoading(true);
-    const codespace = process.env.REACT_APP_CODESPACE_NAME;
-    const protocol = window.location.protocol === 'https:' ? 'https' : 'http';
-    const base = codespace ? `${protocol}://${codespace}-8000.app.github.dev` : '';
-    const endpointPath = 'users';
-    const url = `${base}/api/${endpointPath}/`;
+    const url = apiUrl('users');
 
     fetch(url)
       .then((res) => res.json())
