@@ -1,0 +1,69 @@
+import React, { useEffect, useState } from 'react';
+import { apiUrl } from '../api';
+
+// Codespace API endpoint (used in production/dev codespaces):
+// example: my-codespace-8000.app.github.dev/api/workouts
+
+export default function Workouts() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = () => {
+    setLoading(true);
+    const url = apiUrl('workouts');
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        const list = data && data.results ? data.results : data;
+        setItems(Array.isArray(list) ? list : []);
+      })
+      .catch((err) => console.error('Fetch error (Workouts):', err))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const headers = items && items.length > 0 && typeof items[0] === 'object'
+    ? Object.keys(items[0])
+    : [];
+
+  return (
+    <div className="card">
+      <div className="card-header d-flex justify-content-between align-items-center">
+        <h2 className="h5 mb-0">Workouts</h2>
+        <button className="btn btn-sm btn-outline-secondary" onClick={fetchData} disabled={loading}>
+          {loading ? 'Refreshing...' : 'Refresh'}
+        </button>
+      </div>
+      <div className="card-body">
+        {items.length === 0 ? (
+          <div className="text-muted">No workouts found.</div>
+        ) : (
+          <div className="table-responsive">
+            <table className="table table-striped table-bordered table-hover mb-0">
+              <thead className="table-light">
+                <tr>
+                  {headers.map((h) => (
+                    <th key={h}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((row, idx) => (
+                  <tr key={idx}>
+                    {headers.map((h) => (
+                      <td key={h}>{typeof row[h] === 'object' ? JSON.stringify(row[h]) : String(row[h])}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
